@@ -4,7 +4,7 @@ import threading
     
 
 
-class ChatServer:
+class CafeServer:
     # 연결된 클라이언트 정보 저장하는 리스트
     clients_list = []
     
@@ -92,7 +92,7 @@ class ChatServer:
     # 서버 소켓 생성
     def create_listening_server(self):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # 소켓 생성
-        local_ip = '220.66.218.156' # 서버 ip
+        local_ip = '127.0.0.1' # 서버 ip
         local_port = 50005 # 포트 번호
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
         self.server_socket.bind((local_ip, local_port))
@@ -154,4 +154,4 @@ class ChatServer:
 
 # 메인 함수
 if __name__ == "__main__":
-    ChatServer()
+    CafeServer()
