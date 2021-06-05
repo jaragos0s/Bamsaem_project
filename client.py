@@ -4,13 +4,14 @@ import socket
 import threading
 import _tkinter
 from tkinter import Tk
-
+import time
 from tkinter import messagebox
 import matplotlib
 matplotlib.use("TkAgg")
 
 
 class CafeClient:
+    state=False
     americano=30
     latte=30
     smoothie = 30
@@ -21,10 +22,42 @@ class CafeClient:
     prafe = 30
     client_socket = None
     last_received_message = None
+    lock=threading.Lock()
 
     
 
     def __init__(self, root):
+        
+
+
+        self.initialize_socket()
+        self.initialize_gui()
+        self.listen_for_incoming_messages_in_a_thread()
+    # 새로고침 버튼시 수량갱신시켜줄 함수
+    def changeText1(self):
+        self.text.set(self.americano)
+    def changeText2(self):
+        self.text1.set(self.latte)
+    def changeText3(self):
+        self.text2.set(self.waffle)
+    def changeText4(self):
+        self.text3.set(self.smoothie)
+    def changeText5(self):
+        self.text4.set(self.coldbrew)
+    def changeText6(self):
+        self.text5.set(self.espresso)
+    def changeText7(self):
+        self.text6.set(self.prafe)
+    
+    #server ip,port 번호 할당
+    def initialize_socket(self):
+        
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        remote_ip = '172.30.1.58'
+        remote_port = 50006
+        self.client_socket.connect((remote_ip, remote_port))
+    #gui 생성
+    def initialize_gui(self):
         # Label과 Button 생성
         self.root = root
         self.label = tk.Label(self.root, text = '남은 수량').grid(row = 10, column = 100)
@@ -77,34 +110,6 @@ class CafeClient:
         self.label15.grid(row = 220, column = 100, padx = 10, pady = 10)
         self.button7.grid(row = 220, column = 70, padx = 10, pady = 10)
 
-
-        self.initialize_socket()
-        self.initialize_gui()
-        self.listen_for_incoming_messages_in_a_thread()
-    # 새로고침 버튼시 수량갱신시켜줄 함수
-    def changeText1(self):
-        self.text.set(self.americano)
-    def changeText2(self):
-        self.text1.set(self.latte)
-    def changeText3(self):
-        self.text2.set(self.waffle)
-    def changeText4(self):
-        self.text3.set(self.smoothie)
-    def changeText5(self):
-        self.text4.set(self.coldbrew)
-    def changeText6(self):
-        self.text5.set(self.espresso)
-    def changeText7(self):
-        self.text6.set(self.prafe)
-    
-    #server ip,port 번호 할당
-    def initialize_socket(self):
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        remote_ip = '127.0.0.1'
-        remote_port = 50005
-        self.client_socket.connect((remote_ip, remote_port))
-    #gui 생성
-    def initialize_gui(self):
         self.display_name_section()
         self.americano1()
         self.latte1()
@@ -127,7 +132,12 @@ class CafeClient:
                 button1['state'] = tk.DISABLED
             if self.americano >= 1:
                 self.enter_text_widget = "americano 1"
-                self.send_info()
+                self.lock.acquire()
+                if self.lock.locked():
+                    self.state=True
+                    self.send_acquire_message()
+                    time.sleep(0.01)
+                    self.send_info()
 
         label1 = Label(self.root, text = 'americano')
     
@@ -142,7 +152,12 @@ class CafeClient:
                 button1['state'] = tk.DISABLED
             if self.latte >= 1:
                 self.enter_text_widget = "latte 1"
-                self.send_info()
+                self.lock.acquire()
+                if self.lock.locked():
+                    self.state=True
+                    self.send_acquire_message()
+                    time.sleep(0.01)
+                    self.send_info()
 
         label1 = Label(self.root, text = 'Latte ')
         label1.grid(row = 70, column = 10)
@@ -155,7 +170,12 @@ class CafeClient:
                 button1['state'] = tk.DISABLED
             if self.waffle >= 1:
                 self.enter_text_widget = "waffle 1"
-                self.send_info()
+                self.lock.acquire()
+                if self.lock.locked():
+                    self.state=True
+                    self.send_acquire_message()
+                    time.sleep(0.01)
+                    self.send_info()
 
         label1 = Label(self.root, text = 'waffle ')
         label1.grid(row = 100, column = 10)
@@ -168,7 +188,12 @@ class CafeClient:
                 button1['state'] = tk.DISABLED
             if self.smoothie >= 1:
                 self.enter_text_widget = "smoothie 1"
-                self.send_info()
+                self.lock.acquire()
+                if self.lock.locked():
+                    self.state=True
+                    self.send_acquire_message()
+                    time.sleep(0.01)
+                    self.send_info()
 
         label1 = Label(self.root, text = 'smoothie ')
         label1.grid(row = 130, column = 10)
@@ -181,8 +206,13 @@ class CafeClient:
                 button1['state'] = tk.DISABLED
             if self.coldbrew >= 1:
                 self.enter_text_widget = "coldbrew 1"
-                self.send_info()
-
+                self.lock.acquire()
+                if self.lock.locked():
+                    self.state=True
+                    self.send_acquire_message()
+                    time.sleep(0.01)
+                    self.send_info()
+        
         label1 = Label(self.root, text = 'cold brew ')
         label1.grid(row = 160, column = 10)
         button1 = Button(self.root, text = 'buy', width = 5, command = click_coldbrew)
@@ -194,7 +224,12 @@ class CafeClient:
                 button1['state'] = tk.DISABLED
             if self.espresso >= 1:
                 self.enter_text_widget = "espresso 1"
-                self.send_info()
+                self.lock.acquire()
+                if self.lock.locked():
+                    self.state=True
+                    self.send_acquire_message()
+                    time.sleep(0.01)
+                    self.send_info()
 
         label1 = Label(self.root, text = 'espresso ')
         label1.grid(row = 190, column = 10)
@@ -207,7 +242,12 @@ class CafeClient:
                 button1['state'] = tk.DISABLED
             if self.prafe >= 1:
                 self.enter_text_widget = "prafe 1"
-                self.send_info()
+                self.lock.acquire()
+                if self.lock.locked():
+                    self.state=True
+                    self.send_acquire_message()
+                    time.sleep(0.01)
+                    self.send_info()
 
         label1 = Label(self.root, text = 'prafe ')
         label1.grid(row = 220, column = 10)
@@ -224,7 +264,11 @@ class CafeClient:
             text=buf.decode('utf-8')
             if text[0]==' ':
                 self.americano,self.latte,self.waffle, self.smoothie, self.coldbrew, self.espresso, self.prafe =map(int,text[1:].split())
-
+                
+                if self.state :
+                    self.lock.release()
+                    self.state=False
+                    self.send_release_message()
             self.info_transcript_area.yview(END)
         so.close()
     #display_name_section
@@ -259,22 +303,14 @@ class CafeClient:
     def on_enter_key_pressed(self, event):
         if len(self.name_widget.get()) == 0:
             messagebox.showerror(
-                "Enter your name", "Enter your name to send a message")
+                "Enter your name")
             return
         self.send_info()
         self.clear_text()
     # clear text
     def clear_text(self):
         self.enter_text_widget.delete(1.0, 'end')
-    
-    def send_info1(self):
-        senders_name = self.name_widget.get()
-        data = self.enter_text_widget.strip()
-        message = (senders_name + data).encode('utf-8')
-        self.info_transcript_area.insert('end', message.decode('utf-8') + '\n')
-        self.info_transcript_area.yview(END)
-        self.client_socket.send(message)
-        return 'break'
+
     # send information
     def send_info(self):
         senders_name = self.name_widget.get().strip() + ":"
@@ -284,6 +320,13 @@ class CafeClient:
         self.info_transcript_area.yview(END)
         self.client_socket.send(message)
         return 'break'
+    def send_acquire_message(self):
+        message=("acquire lock").encode('utf-8')
+        self.client_socket.send(message)
+    def send_release_message(self):
+        message=("release lock").encode('utf-8')
+        self.client_socket.send(message)
+
 
 if __name__ == '__main__':
     root = Tk()
